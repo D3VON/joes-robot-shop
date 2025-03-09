@@ -20,8 +20,10 @@ export class UserService {
 
   signIn(credentials: IUserCredentials): Observable<IUser> {
     return this.http
-      .post<IUser>('/api/sign-in', credentials)
-      .pipe(map((user: IUser) => {
+      .post<IUser>('/api/sign-in', credentials) // credentials is the body
+      .pipe(map((user: IUser) => { // pipe the return to the map func. to grab, then cache the returned user obj
+            // normally map is used to iterate over all the items in an Observable, and possibly change them. Here,
+            // map lets us grab the emitted val. from the Observable while still letting us return the Observable to subscribers.
         this.user.next(user);
         return user;
       }));

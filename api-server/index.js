@@ -1,9 +1,10 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 
+// these lines start up the express server for us.
 const app = express();
 app.use(bodyParser.json());
-/* 
+/*
   IMPORTANT:
     ***NEVER*** store credentials unencrypted like this.
     This is for demo purposes only in order to simulate a functioning API serverr.
@@ -233,8 +234,8 @@ app.post("/api/register", (req, res) =>
 
 /* IMPORTANT:
     The code below is for demo purposes only and does not represent good security
-    practices. In a production application user credentials would be cryptographically 
-    stored in a database server and the password should NEVER be stored as plain text. 
+    practices. In a production application user credentials would be cryptographically
+    stored in a database server and the password should NEVER be stored as plain text.
 */
 app.post("/api/sign-in", (req, res) => {
   const user = users[req.body.email];

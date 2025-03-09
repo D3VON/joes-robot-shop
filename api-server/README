@@ -1,0 +1,45 @@
+in my own words:
+
+TODO: Look up "express server" to learn how this is really working.
+
+this api-server directory contains a set of node modules, which is an express server written in node.
+
+FIRST: (just the first time on a new set-up)
+run:
+
+    npm install
+
+By doing that, it pulls node modules into the node_modules directory.  I guess that way the index.js file can use them.
+
+I guess doing npm install will automatically look at package.json and use that to pull down the modules.
+
+NEXT:
+run:
+
+    npm start
+
+ That server will then listen on port 8081
+
+index.js is essentially our 'main' (defined in package.json, which npm start reads).
+In index.js you can see some routes that will return hard-coded responses.
+
+
+Important: in the Angular app (in the src dir.) there is a file named proxy.conf.json which has this:
+    {
+        "/api": {
+            "target": "http://localhost:8081",
+            "secure": false
+        }
+    }
+...this tells Angular, if it receives a request that begins /api, don't use our routing in Angular, but rather use this URL (the proxy server).
+
+Important: then, in angular.json, we added "proxyConfig": "src/proxy.conf.json"
+            to "serve":"configurations":"development"
+            ...this tells Angular to look at that proxy.conf.json file when running as the development environment
+
+            ...btw, I'm not sure how to run as development versus as production :(
+
+FINALLY:
+run: (in another terminal, the root directory)
+
+    npm start

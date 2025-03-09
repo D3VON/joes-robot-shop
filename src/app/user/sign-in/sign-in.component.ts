@@ -12,7 +12,9 @@ export class SignInComponent {
   credentials: IUserCredentials = { email: '', password: '' };
   signInError: boolean = false;
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(
+    private userService: UserService, // a class that connects to the simple node server (in api-server directory)
+    private router: Router) { }
 
   signIn() {
     this.signInError = false;

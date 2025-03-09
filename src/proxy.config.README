@@ -1,0 +1,15 @@
+This config file (proxy.config.json) specifies "routes" to "hijack".
+
+"src/proxy.conf.json" is specified in angular.json at projects.joes-robot-shop.architect.serve.development.proxyConfig
+
+This enables us to run the proxy server (express: see the api-server directory and its README).
+
+We've specified that any route that begins with /api should be handled by the proxy server
+(aka data server, which is an express server, which we have to run separately from our actual app).
+
+For example, our app is running like this: localhost:4200
+so, if we hit http://localhost:8081 , that's the proxy server, and if we hit it with the path:
+
+  http://localhost:8081/api
+
+...then it will be handled by the proxy server.
