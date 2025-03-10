@@ -1,0 +1,22 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more: https://aka.ms/yaml
+
+trigger:
+- main  # This pipeline runs automatically whenever there is a commit to the "main" branch
+
+pool:
+  name: 'D3VON-self-hosted-agent'  # This should match your agent pool name
+  #vmImage: 'ubuntu-latest'  # Specifies that the pipeline will run on a Linux-based virtual machine
+
+steps:
+- script: echo "Hello, Azure DevOps! Build triggered by GitHub commit."
+  displayName: 'Run a one-line script'
+
+- task: Docker@2  						# Uses the Docker task in Azure DevOps to build and push images
+  inputs:
+    containerRegistry: 'd3vonregistry_service_connection'	# MISLEADING TAG NAME: this should be the service connection name of the Azure Container Registry. set up: In your DevOps project (D3VON), open Project Settings (extreme bottom left) -> Service connections, then I did Docker Registry...    
+    repository: 'joes-robot-shop'  		# Name of the container repository in ACR -- in the registry, search for 'repositories' for it to show up
+    command: 'buildAndPush'  			# Builds and pushes the Docker image to the registry
+    Dockerfile: '**/Dockerfile'  		# Path to the Dockerfile (in the root folder)
+    tags: '$(Build.BuildId)'  			# Tags the Docker image with the unique Build ID
