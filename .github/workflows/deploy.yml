@@ -1,7 +1,12 @@
-name: Manual Deploy to Azure App Service
+name: Manual Deploy branch to Azure App Service
 
 on:
-  workflow_dispatch:  # Allows manual deployment from GitHub Actions UI
+  workflow_dispatch:  # Allows users to manually trigger deployment
+    inputs:
+      branch:
+        description: 'Branch to Deploy'
+        required: true
+        default: 'main'
 
 env:
   AZURE_WEBAPP_NAME: "joes-robot-shop"
@@ -11,16 +16,22 @@ env:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # choices are windows, iOS, or ubuntu, apparently
+    runs-on: ubuntu-latest  # Keep this unless you need Windows/Mac runners
 
     steps:
     - name: Log in to Azure
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }} # see github repo's UI: settings/secrets & vars/Actions 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # see github repo's UI: settings/secrets & vars/Actions 
 
-    - name: Trigger Azure App Service to Pull Latest Image
-      run: |   # variables are defined at the top of this file
+    - name: Determine Image Tag Based on Selected Branch
+      run: |   # Some vars are defined at the top of this file.  The >> append redirection to $GITHUB_ENV makes the TAG variable persist across steps.
+        BRANCH_NAME=${{ github.event.inputs.branch }}
+        TAG=$(az acr repository show-tags --name $ACR_NAME --repository $IMAGE_NAME --query "[?contains(@, '$BRANCH_NAME')]" --output tsv | sort -r | head -n 1)
+        echo "TAG=$TAG" >> $GITHUB_ENV 
+
+    - name: Deploy Selected Image to Azure App Service
+      run: |
         az webapp config container set --name $AZURE_WEBAPP_NAME \
           --resource-group $RESOURCE_GROUP \
-          --docker-custom-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME
+          --docker-custom-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME:$TAG
