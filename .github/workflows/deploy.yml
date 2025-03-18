@@ -1,0 +1,26 @@
+name: Manual Deploy to Azure App Service
+
+on:
+  workflow_dispatch:  # Allows manual deployment from GitHub Actions UI
+
+env:
+  AZURE_WEBAPP_NAME: "joes-robot-shop"
+  RESOURCE_GROUP: "D3VONRG"
+  ACR_NAME: "d3vonregistry"
+  IMAGE_NAME: "joes-robot-shop"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # choices are windows, iOS, or ubuntu, apparently
+
+    steps:
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # see github repo's UI: settings/secrets & vars/Actions 
+
+    - name: Trigger Azure App Service to Pull Latest Image
+      run: |   # variables are defined at the top of this file
+        az webapp config container set --name $AZURE_WEBAPP_NAME \
+          --resource-group $RESOURCE_GROUP \
+          --docker-custom-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME
