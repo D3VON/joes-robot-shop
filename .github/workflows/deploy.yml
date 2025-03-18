@@ -22,7 +22,7 @@ jobs:
     - name: Log in to Azure
       uses: azure/login@v1
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}  # see github repo's UI: settings/secrets & vars/Actions 
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # see github repo's UI: settings / secrets & vars / Actions 
 
     - name: Determine Image Tag Based on Selected Branch
       run: |   # Some vars are defined at the top of this file.  The >> append redirection to $GITHUB_ENV makes the TAG variable persist across steps.
