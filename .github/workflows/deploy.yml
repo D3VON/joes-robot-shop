@@ -27,7 +27,14 @@ jobs:
     - name: Determine Image Tag Based on Selected Branch
       run: |   # Some vars are defined at the top of this file.  The >> append redirection to $GITHUB_ENV makes the TAG variable persist across steps.
         BRANCH_NAME=${{ github.event.inputs.branch }}
+        echo "Searching for tags matching branch name: $BRANCH_NAME"
         TAG=$(az acr repository show-tags --name $ACR_NAME --repository $IMAGE_NAME --query "[?contains(@, '$BRANCH_NAME')]" --output tsv | sort -r | head -n 1)
+        
+        if [ -z "$TAG" ]; then
+          echo "ERROR: No tag found in ACR matching the branch name: $BRANCH_NAME"
+          exit 1
+        fi
+        
         echo "TAG=$TAG" >> $GITHUB_ENV 
 
     - name: Deploy Selected Image to Azure App Service
