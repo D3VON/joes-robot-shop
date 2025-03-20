@@ -6,10 +6,14 @@ trigger:
       - feature/*  # Matches branches like feature/new-ui, feature/fix-bug
 
 variables:
-  BRANCH_NAME: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
+
   # Build.SourceBranchName only returns the last segment of a branch name,
   # and Build.SourceBranch returns a little to much, so we have to snipp that off
   # to get the pattern 'feature/branchname'
+  BRANCH_NAME: $[replace(variables['Build.SourceBranch'], 'refs/heads/', '')]
+  
+  # convert feature/testing-yml into a valid Docker tag format.
+  SAFE_BRANCH_NAME: $[replace(variables['BRANCH_NAME'], '/', '-')]  # Replaces "/" with "-"
 
 pool:
   name: 'D3VON-self-hosted-agent'  # This should match your agent pool name
@@ -24,5 +28,5 @@ steps:
     repository: 'joes-robot-shop'       # Name of the container repository in ACR -- in the registry, search for 'repositories' for it to show up
     command: 'buildAndPush'             # Builds and pushes the Docker image to the registry
     Dockerfile: '**/Dockerfile'         # Path to the Dockerfile (in the root folder)
-    tags: '$(Build.BuildId),$(BRANCH_NAME),$(Build.SourceVersion)' # three tags given as a list
+    tags: '$(Build.BuildId),$(SAFE_BRANCH_NAME),$(Build.SourceVersion)' # three tags given as a list
  
