@@ -19,3 +19,4 @@ steps:
     command: 'buildAndPush'             # Builds and pushes the Docker image to the registry
     Dockerfile: '**/Dockerfile'         # Path to the Dockerfile (in the root folder)
     tags: '$(Build.BuildId),$(Build.SourceBranchName),$(Build.SourceVersion)' # three tags given as a list
+ 
