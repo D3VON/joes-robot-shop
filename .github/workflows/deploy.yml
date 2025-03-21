@@ -48,7 +48,7 @@ jobs:
         echo "Branch selected: ${{ github.event.inputs.branch }}"
         echo "Tag to be deployed: $TAG"
 
-    - name: Deploy Selected Image to Azure App Service
+    - name: Deploy the Selected Image to Azure App Service
       run: |
         az webapp config container set --name $AZURE_WEBAPP_NAME \
           --resource-group $RESOURCE_GROUP \
