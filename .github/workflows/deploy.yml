@@ -27,12 +27,33 @@ jobs:
     - name: Determine Image Tag Based on Selected Branch
       run: |   # Some vars are defined at the top of this file.  The >> append redirection to $GITHUB_ENV makes the TAG variable persist across steps.
         BRANCH_NAME=${{ github.event.inputs.branch }}
-        TAG=$(az acr repository show-tags --name $ACR_NAME --repository $IMAGE_NAME --query "[?contains(@, '$BRANCH_NAME')]" --output tsv | sort -r | head -n 1)
+        
+        # Convert branch name to a valid tag format
+        AZURE_SAFE_BRANCH_NAME=$(echo $BRANCH_NAME | sed 's/\//-/g')  # Converts "/" to "-"
+        echo "Searching for tags matching branch name: $AZURE_SAFE_BRANCH_NAME"
+                
+        # Fetch the latest matching tag from ACR
+        TAG=$(az acr repository show-tags --name $ACR_NAME --repository $IMAGE_NAME --query "[?contains(@, '$AZURE_SAFE_BRANCH_NAME')]" --output tsv | sort -r | head -n 1)
+                
+        if [ -z "$TAG" ]; then
+          echo "ERROR: No tag found in ACR matching the branch name: $AZURE_SAFE_BRANCH_NAME"
+          exit 1
+        fi
+
+        echo "Found tag: $TAG"
         echo "TAG=$TAG" >> $GITHUB_ENV 
 
-    - name: Deploy Selected Image to Azure App Service
+    - name: Show Detected Branch and Tag
+      run: |
+        echo "Branch selected: ${{ github.event.inputs.branch }}"
+        echo "Tag to be deployed: $TAG"
+
+    - name: Deploy the Selected Image to Azure App Service
       run: |
         az webapp config container set --name $AZURE_WEBAPP_NAME \
           --resource-group $RESOURCE_GROUP \
-          --docker-custom-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME:$TAG
- 
+          --container-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME:$TAG \
+          --container-registry-url https://d3vonregistry.azurecr.io \
+          --container-registry-user "Managed Identity"
+
+
