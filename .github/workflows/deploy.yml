@@ -52,7 +52,8 @@ jobs:
       run: |
         az webapp config container set --name $AZURE_WEBAPP_NAME \
           --resource-group $RESOURCE_GROUP \
-          --docker-custom-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME:$TAG \
-          --docker-registry-server-url https://d3vonregistry.azurecr.io \
-          --docker-registry-server-user "Managed Identity"
- 
+          --container-image-name $ACR_NAME.azurecr.io/$IMAGE_NAME:$TAG \
+          --container-registry-url https://d3vonregistry.azurecr.io \
+          --container-registry-user "Managed Identity"
+
+
